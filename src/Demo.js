@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -16,95 +16,49 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-
-function createData(
-    id,
-    industryId,
-    appVersion,
-    appPlatform,
-    userId,
-    tenantId,
-    tenantLocationId,
-    cardInfo,
-    errorMessage,
-    errorData,
-    createdDate
-) {
-    return {
-        id,
-        industryId,
-        appVersion,
-        appPlatform,
-        userId,
-        tenantId,
-        tenantLocationId,
-        cardInfo,
-        errorMessage,
-        errorData,
-        createdDate
-    };
-}
+import {
+    MuiPickersUtilsProvider,
+    KeyboardDatePicker
+} from '@material-ui/pickers';
+import Grid from '@material-ui/core/Grid';
+import DateFnsUtils from '@date-io/date-fns';
+import Button from '@material-ui/core/Button';
+import Modal from 'react-responsive-modal';
 
 const rows = [
-    createData('Cupcake', 305, 3.7, 67, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData('Donut', 452, 25.0, 51, 4.9, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData(
-        'Frozen yoghurt',
-        159,
-        6.0,
-        24,
-        4.0,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3
-    ),
-    createData('Gingerbread', 356, 16.0, 49, 3.9, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData('Honeycomb', 408, 3.2, 87, 6.5, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData(
-        'Ice cream sandwich',
-        237,
-        9.0,
-        37,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3
-    ),
-    createData('Jelly Bean', 375, 0.0, 94, 0.0, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData('KitKat', 518, 26.0, 65, 7.0, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData('Lollipop', 392, 0.2, 98, 0.0, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData('Marshmallow', 318, 0, 81, 2.0, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData('Nougat', 360, 19.0, 9, 37.0, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3),
-    createData(
-        'Oreo',
-        437,
-        18.0,
-        63,
-        4.0,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3,
-        4.3
-    )
+    {
+        id: 1,
+        industryId: 1,
+        indexRelatedOnly: false,
+        indexMainOnly: false,
+        fireNotification: false,
+        appVersion: 'APP_V.1.0.4',
+        appPlatform: 0,
+        userId: 2087,
+        tenantId: 1,
+        tenantLocationId: 21,
+        cardInfo: 'LEADERBOARD',
+        errorMessage: 'Clue/General-Message What Went Wrong',
+        errorData: 'Valuable Stack Trace here..',
+        createdDate: 1570622614781
+    },
+    {
+        id: 2,
+        industryId: 1,
+        indexRelatedOnly: false,
+        indexMainOnly: false,
+        fireNotification: false,
+        appVersion: 'APP_V.1.0.4',
+        appPlatform: 0,
+        userId: 2087,
+        tenantId: 1,
+        tenantLocationId: 21,
+        cardInfo: 'LEADERBOARD',
+        errorMessage: 'Clue/General-Message What Went Wrong',
+        errorData: 'Valuable Stack Trace here..',
+        createdDate: 1570622614781
+    }
 ];
 
 function desc(a, b, orderBy) {
@@ -296,7 +250,56 @@ const useToolbarStyles = makeStyles(theme => ({
 const EnhancedTableToolbar = props => {
     const classes = useToolbarStyles();
     const { numSelected } = props;
+    const [selectedStartDate, setSelectedStartDate] = React.useState(
+        new Date(Date.now() - 864e5)
+    );
+    const [selectedEndDate, setSelectedEndDate] = React.useState(new Date());
 
+    const handleStartDateChange = date => {
+        setSelectedStartDate(date);
+    };
+
+    const handleEndDateChange = date => {
+        setSelectedEndDate(date);
+    };
+
+    const sliceData = () => {
+      console.log("SLICE HAS BEEN CALLED");
+      console.log(numSelected)
+  
+    };
+    const [open, setModelSTATE] = useState(false);
+
+    function onCloseModal() {
+      setModelSTATE(true)
+    };
+  
+    function onCloseModal() {
+      setModelSTATE(false)
+    };
+  
+  
+    const handleClickForModal = (event, rowData) => {
+      setModelSTATE(true);
+      console.log(rowData);
+      rowDataForModal = {
+        id: rowData.id,
+        industryId: rowData.industryId,
+        errorMessage: rowData.errorMessage,
+        errorData: rowData.errorData,
+        cardInfo: rowData.cardInfo
+      };
+  
+    };
+  
+  
+    var rowDataForModal = {
+      id: 2,
+      industryId: 1,
+      errorMessage: 'Clue/General-Message What Went Wrong',
+      errorData: 'Valuable Stack Trace here..',
+      cardInfo: 'LEADERBOARD'
+    };
     return (
         <Toolbar
             className={clsx(classes.root, {
@@ -323,11 +326,49 @@ const EnhancedTableToolbar = props => {
                         </IconButton>
                     </Tooltip>
                 ) : (
-                    <Tooltip title="Filter list">
-                        <IconButton aria-label="filter list">
-                            <FilterListIcon />
-                        </IconButton>
-                    </Tooltip>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <Grid container spacing={1}>
+                            <Grid item xs={4}>
+                                <KeyboardDatePicker
+                                    disableToolbar
+                                    variant="inline"
+                                    format="MM/dd/yyyy"
+                                    margin="normal"
+                                    id="date-picker-inline"
+                                    label="Start Date"
+                                    value={selectedStartDate}
+                                    onChange={handleStartDateChange}
+                                    KeyboardButtonProps={{
+                                        'aria-label': 'change date'
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={4}>
+                                <KeyboardDatePicker
+                                    disableToolbar
+                                    variant="inline"
+                                    format="MM/dd/yyyy"
+                                    margin="normal"
+                                    id="date-picker-inline"
+                                    label="End Date"
+                                    value={selectedEndDate}
+                                    onChange={handleEndDateChange}
+                                    KeyboardButtonProps={{
+                                        'aria-label': 'change date'
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={4} container alignItems="center">
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className={classes.button}
+                                >
+                                    Search
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </MuiPickersUtilsProvider>
                 )}
             </div>
         </Toolbar>
@@ -367,14 +408,67 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function EnhancedTable() {
+    function myfunction() {
+        const options = {
+            method: 'GET',
+            headers: {
+                Authorization: 'bearer 18c00b5d-914e-4e0f-8f6c-daf0c9c6fdb2',
+                'Content-Type': 'application/json',
+                industryId: 1
+            },
+            url:
+                'https://qa-app.fpg-ingauge.com/pulse/api/error-log/secure?startDateTime=0&endDateTime=9999999999999'
+        };
+        axios(options)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    useEffect(() => {
+        myfunction();
+    }, []);
     const classes = useStyles();
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
-    const [dense, setDense] = React.useState(false);
+    const [dense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [open, setModelSTATE] = useState(false);
 
+    function onCloseModal() {
+      setModelSTATE(true)
+    };
+  
+    function onCloseModal() {
+      setModelSTATE(false)
+    };
+  
+  
+    const handleClickForModal = (event, rowData) => {
+      setModelSTATE(true);
+      console.log(rowData);
+      rowDataForModal = {
+        id: rowData.id,
+        industryId: rowData.industryId,
+        errorMessage: rowData.errorMessage,
+        errorData: rowData.errorData,
+        cardInfo: rowData.cardInfo
+      };
+  
+    };
+  
+  
+    var rowDataForModal = {
+      id: 2,
+      industryId: 1,
+      errorMessage: 'Clue/General-Message What Went Wrong',
+      errorData: 'Valuable Stack Trace here..',
+      cardInfo: 'LEADERBOARD'
+    };
     const handleRequestSort = (event, property) => {
         const isDesc = orderBy === property && order === 'desc';
         setOrder(isDesc ? 'asc' : 'desc');
@@ -419,10 +513,6 @@ export default function EnhancedTable() {
         setPage(0);
     };
 
-    const handleChangeDense = event => {
-        setDense(event.target.checked);
-    };
-
     const isSelected = name => selected.indexOf(name) !== -1;
 
     const emptyRows =
@@ -431,12 +521,11 @@ export default function EnhancedTable() {
     return (
         <div className={classes.root}>
             <Paper className={classes.paper}>
-                <EnhancedTableToolbar numSelected={selected.length} />
-                <div className={classes.tableWrapper}>
+            <EnhancedTableToolbar numSelected={selected.length} sliceIds={selected} />                <div className={classes.tableWrapper}>
                     <Table
+                        stickyHeader
                         className={classes.table}
                         aria-labelledby="tableTitle"
-                        size={dense ? 'small' : 'medium'}
                     >
                         <EnhancedTableHead
                             classes={classes}
@@ -460,9 +549,6 @@ export default function EnhancedTable() {
                                     return (
                                         <TableRow
                                             hover
-                                            onClick={event =>
-                                                handleClick(event, row.id)
-                                            }
                                             role="checkbox"
                                             aria-checked={isItemSelected}
                                             tabIndex={-1}
@@ -470,51 +556,95 @@ export default function EnhancedTable() {
                                             selected={isItemSelected}
                                         >
                                             <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell
-                                                component="th"
-                                                id={labelId}
-                                                scope="row"
-                                                padding="none"
-                                            >
-                                                {row.id}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.industryId}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.appVersion}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.appPlatform}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.userId}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.tenantId}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.tenantLocationId}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.cardInfo}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.errorMessage}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.errorData}
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                {row.createdDate}
-                                            </TableCell>
+                        <Checkbox
+                          onClick={event =>
+                            handleClick(event, row.id)
+                          }
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                      >
+                        {row.id}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.industryId}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.appVersion}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.appPlatform}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.userId}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.tenantId}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.tenantLocationId}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.cardInfo}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.errorMessage}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.errorData}
+                      </TableCell>
+                      <TableCell
+                        onClick={event =>
+                          handleClickForModal(event, row)
+                        }
+                        align="right">
+                        {row.createdDate}
+                      </TableCell>
+
                                         </TableRow>
                                     );
                                 })}
@@ -529,6 +659,16 @@ export default function EnhancedTable() {
                             )}
                         </TableBody>
                     </Table>
+                  
+<Modal open={open} center
+        onClose={onCloseModal}
+      >
+        <h2>ID : {rowDataForModal.id}</h2>
+        <h2>Industry Id : {rowDataForModal.industryId}</h2>
+        <h2>Card Info : {rowDataForModal.cardInfo}</h2>
+        <h2>Error MEssage : {rowDataForModal.errorMessage}</h2>
+        <h2>Error Data : {rowDataForModal.errorData}</h2>
+      </Modal>
                 </div>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
@@ -546,12 +686,6 @@ export default function EnhancedTable() {
                     onChangeRowsPerPage={handleChangeRowsPerPage}
                 />
             </Paper>
-            <FormControlLabel
-                control={
-                    <Switch checked={dense} onChange={handleChangeDense} />
-                }
-                label="Dense padding"
-            />
         </div>
     );
 }
