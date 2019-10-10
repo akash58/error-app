@@ -310,7 +310,7 @@ const EnhancedTableToolbar = props => {
                     </Typography>
                 ) : (
                     <Typography variant="h6" id="tableTitle">
-                        Nutrition
+                        Error Response
                     </Typography>
                 )}
             </div>
@@ -319,13 +319,13 @@ const EnhancedTableToolbar = props => {
                 {numSelected > 0 ? (
                     <Tooltip title="Delete">
                         <IconButton aria-label="delete">
-                            {/* <DeleteIcon /> */}
+                            <DeleteIcon />
                         </IconButton>
                     </Tooltip>
                 ) : (
                     <Tooltip title="Filter list">
                         <IconButton aria-label="filter list">
-                            {/* <FilterListIcon /> */}
+                            <FilterListIcon />
                         </IconButton>
                     </Tooltip>
                 )}
