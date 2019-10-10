@@ -26,6 +26,18 @@ import DateFnsUtils from '@date-io/date-fns';
 import Button from '@material-ui/core/Button';
 import Modal from 'react-responsive-modal';
 import moment from 'moment';
+import Drawer from '@material-ui/core/Drawer';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import MailIcon from '@material-ui/icons/Mail';
+import AppBar from '@material-ui/core/AppBar';
+import MenuIcon from '@material-ui/icons/Menu';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const rows = [
     {
@@ -245,7 +257,16 @@ const useToolbarStyles = makeStyles(theme => ({
     },
     title: {
         flex: '0 0 auto'
-    }
+    },
+    rootAppBar: {
+        flexGrow: 1,
+      },
+      menuButton: {
+        marginRight: theme.spacing(2),
+      },
+      titleAppBar: {
+        flexGrow: 1,
+      }
 }));
 
 const EnhancedTableToolbar = props => {
@@ -293,86 +314,193 @@ const EnhancedTableToolbar = props => {
   
     };
   
-  
-    var rowDataForModal = {
+    const rowDataForModal = {
       id: 2,
       industryId: 1,
       errorMessage: 'Clue/General-Message What Went Wrong',
       errorData: 'Valuable Stack Trace here..',
       cardInfo: 'LEADERBOARD'
     };
-    return (
-        <Toolbar
-            className={clsx(classes.root, {
-                [classes.highlight]: numSelected > 0
-            })}
+    const [state, setState] = React.useState({
+        left: false
+      });
+      const toggleDrawer = (side, open) => event => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+          return;
+        }
+    
+        setState({ ...state, [side]: open });
+      };
+      const sideList = side => (
+        <div
+          className={classes.list}
+          role="presentation"
+          onClick={toggleDrawer(side, false)}
+          onKeyDown={toggleDrawer(side, false)}
         >
-            <div className={classes.title}>
-                {numSelected > 0 ? (
-                    <Typography color="inherit" variant="subtitle1">
-                        {numSelected} selected
-                    </Typography>
-                ) : (
-                    <Typography variant="h6" id="tableTitle">
-                        Error Response
-                    </Typography>
-                )}
-            </div>
-            <div className={classes.spacer} />
-            <div className={classes.actions}>
-                {numSelected > 0 ? (
-                    <Tooltip title="Delete">
-                        <IconButton aria-label="delete">
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                ) : (
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <Grid container spacing={1}>
-                            <Grid item xs={4}>
-                                <KeyboardDatePicker
-                                    disableToolbar
-                                    variant="inline"
-                                    format="MM/dd/yyyy"
-                                    margin="normal"
-                                    id="date-picker-inline"
-                                    label="Start Date"
-                                    value={selectedStartDate}
-                                    onChange={handleStartDateChange}
-                                    KeyboardButtonProps={{
-                                        'aria-label': 'change date'
-                                    }}
-                                />
+          <List>
+            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+              <ListItem button key={text}>
+                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <List>
+            {['All mail', 'Trash', 'Spam'].map((text, index) => (
+              <ListItem button key={text}>
+                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+        </div>
+      );
+      const fullList = side => (
+        <div
+          className={classes.fullList}
+          role="presentation"
+          onClick={toggleDrawer(side, false)}
+          onKeyDown={toggleDrawer(side, false)}
+        >
+          <List>
+            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+              <ListItem button key={text}>
+                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <List>
+            {['All mail', 'Trash', 'Spam'].map((text, index) => (
+              <ListItem button key={text}>
+                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+        </div>
+      );
+
+      const [anchorEl, setAnchorEl] = React.useState(null);
+      const handleMenuClick = event => {
+        setAnchorEl(event.currentTarget);
+      };
+    
+      const handleMenuClose = () => {
+        setAnchorEl(null);
+      };
+
+    return (
+        <div className={classes.rootAppBar}>
+            <AppBar position="static">
+                <Toolbar>
+                <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={toggleDrawer('left', true)}>
+                    <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" className={classes.titleAppBar}>
+                    Error Response
+                </Typography>
+                <Button color="inherit">Login</Button>
+                </Toolbar>
+            </AppBar>
+    
+            <Toolbar
+                className={clsx(classes.root, {
+                    [classes.highlight]: numSelected > 0
+                })}
+            >
+                <div className={classes.title}>
+                    {numSelected > 0 ? (
+                        <Typography color="inherit" variant="subtitle1">
+                            {numSelected} selected
+                        </Typography>
+                    ) : (
+                        <div>
+      <Button
+        aria-controls="simple-menu"
+        aria-haspopup="true"
+        variant="contained"
+        color="primary"
+        onClick={handleMenuClick}
+      >
+        Error Environment
+      </Button>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleMenuClose}>QA</MenuItem>
+        <MenuItem onClick={handleMenuClose}>Production</MenuItem>
+        <MenuItem onClick={handleMenuClose}>UAT</MenuItem>
+      </Menu>
+    </div>
+                    )}
+                </div>
+                <div className={classes.spacer} />
+                <div className={classes.actions}>
+                    {numSelected > 0 ? (
+                        <Tooltip title="Delete">
+                            <IconButton aria-label="delete">
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+                    ) : (
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <Grid container spacing={1}>
+                                <Grid item xs={4}>
+                                    <KeyboardDatePicker
+                                        disableToolbar
+                                        variant="inline"
+                                        format="MM/dd/yyyy"
+                                        margin="normal"
+                                        id="date-picker-inline"
+                                        label="Start Date"
+                                        value={selectedStartDate}
+                                        onChange={handleStartDateChange}
+                                        KeyboardButtonProps={{
+                                            'aria-label': 'change date'
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <KeyboardDatePicker
+                                        disableToolbar
+                                        variant="inline"
+                                        format="MM/dd/yyyy"
+                                        margin="normal"
+                                        id="date-picker-inline"
+                                        label="End Date"
+                                        value={selectedEndDate}
+                                        onChange={handleEndDateChange}
+                                        KeyboardButtonProps={{
+                                            'aria-label': 'change date'
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={4} container alignItems="center">
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        className={classes.button}
+                                    >
+                                        Search
+                                    </Button>
+                                </Grid>
                             </Grid>
-                            <Grid item xs={4}>
-                                <KeyboardDatePicker
-                                    disableToolbar
-                                    variant="inline"
-                                    format="MM/dd/yyyy"
-                                    margin="normal"
-                                    id="date-picker-inline"
-                                    label="End Date"
-                                    value={selectedEndDate}
-                                    onChange={handleEndDateChange}
-                                    KeyboardButtonProps={{
-                                        'aria-label': 'change date'
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={4} container alignItems="center">
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.button}
-                                >
-                                    Search
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </MuiPickersUtilsProvider>
-                )}
-            </div>
-        </Toolbar>
+                        </MuiPickersUtilsProvider>
+                    )}
+                </div>
+            </Toolbar>
+            <Drawer open={state.left} onClose={toggleDrawer('left', false)}>
+                {sideList('left')}
+            </Drawer>
+        </div>
     );
 };
 
@@ -405,7 +533,13 @@ const useStyles = makeStyles(theme => ({
         position: 'absolute',
         top: 20,
         width: 1
-    }
+    },
+    list: {
+        width: 250,
+      },
+      fullList: {
+        width: 'auto',
+      }
 }));
 
 export default function EnhancedTable() {
@@ -439,6 +573,7 @@ export default function EnhancedTable() {
     const [dense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const [open, setModelSTATE] = useState(false);
+    
 
     function onCloseModal() {
       setModelSTATE(true)
@@ -660,6 +795,7 @@ export default function EnhancedTable() {
                             )}
                         </TableBody>
                     </Table>
+      
                   
 <Modal open={open} center
         onClose={onCloseModal}
