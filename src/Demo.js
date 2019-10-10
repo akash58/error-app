@@ -25,6 +25,7 @@ import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import Button from '@material-ui/core/Button';
 import Modal from 'react-responsive-modal';
+import moment from 'moment';
 
 const rows = [
     {
@@ -237,7 +238,7 @@ const useToolbarStyles = makeStyles(theme => ({
                   backgroundColor: theme.palette.secondary.dark
               },
     spacer: {
-        flex: '1 1 100%'
+        flex: '1 1 77%'
     },
     actions: {
         color: theme.palette.text.secondary
@@ -642,7 +643,7 @@ export default function EnhancedTable() {
                           handleClickForModal(event, row)
                         }
                         align="right">
-                        {row.createdDate}
+                        {moment(row.createdDate).format("DD-MM-YYYY h:mm:ss")}
                       </TableCell>
 
                                         </TableRow>
